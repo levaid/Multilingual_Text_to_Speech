@@ -5,6 +5,7 @@ import math
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 
 from dataset.dataset import TextToSpeechDatasetCollection, TextToSpeechCollate
 from params.params import Params as hp
@@ -46,7 +47,7 @@ def train(logging_start_epoch, epoch, data, model, criterion, optimizer):
     done, start_time = 0, time.time()
 
     # loop through epoch batches
-    for i, batch in enumerate(data):     
+    for i, batch in tqdm(enumerate(data)):     
 
         global_step = done + epoch * len(data)
         optimizer.zero_grad() 
@@ -200,7 +201,7 @@ if __name__ == '__main__':
     np.random.seed(42)
     torch.manual_seed(42)
     torch.backends.cudnn.enabled = True
-    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.deterministic = False
     torch.backends.cudnn.benchmark = False
 
     # prepare directory for checkpoints 

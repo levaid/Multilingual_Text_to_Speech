@@ -1,6 +1,7 @@
 import sys
 import os
 import numpy as np
+from tqdm import tqdm
 
 sys.path.insert(0, "../")
 
@@ -32,28 +33,31 @@ if __name__ == '__main__':
     files_to_solve = [
         (args.css10_directory, "train.txt"),
         (args.css10_directory, "val.txt"),
-        (args.css_comvoi_directory, "train.txt"),
-        (args.css_comvoi_directory, "val.txt"),
     ]
-
-    spectrogram_dirs = [os.path.join(args.comvoi_directory, 'spectrograms'), 
-                        os.path.join(args.comvoi_directory, 'linear_spectrograms'),
-                        os.path.join(args.css10_directory, 'spectrograms'), 
+    spectrogram_dirs = [os.path.join(args.css10_directory, 'spectrograms'), 
                         os.path.join(args.css10_directory, 'linear_spectrograms')]
+
     for x in spectrogram_dirs:
         if not os.path.exists(x): os.makedirs(x)
 
     metadata = []
+    print(files_to_solve)
     for d, fs in files_to_solve:
         with open(os.path.join(d,fs), 'r', encoding='utf-8') as f:
-            metadata.append((d, fs, [line.rstrip().split('|') for line in f]))
+            current_data = []
+            for line in f:
+                current_data.append(line.rstrip().split('|'))
+            print(len(current_data))
+            metadata.append((d, fs, current_data))
 
     print(f'Please wait, this may take a very long time.')
+    print(len(metadata))
+    print(len(metadata[0][2]))
     for d, fs, m in metadata:  
         print(f'Creating spectrograms for: {fs}')
 
         with open(os.path.join(d, fs), 'w', encoding='utf-8') as f:
-            for i in m:
+            for i in tqdm(m):
                 idx, s, l, a, _, _, raw_text, ph = i
                 spec_name = idx + '.npy'      
                 audio_path = os.path.join(d, a)       
